@@ -186,10 +186,6 @@ command /bf <text> <text = "">:
 
         send from_code_points({_output::*}) to sender
 
-command /bfc <text>:
-    trigger:
-        send to_code_point(arg 1) to sender
-
 # ラップアラウンド演算において8ビット符号なし整数に1を足す。
 function plus(x: integer) :: integer:
     if {_x} is equal to 255:
