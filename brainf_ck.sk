@@ -1,0 +1,264 @@
+options:
+    MAX_STEPS: 100000  # 1回のプログラムで実行できるステップ数の上限。
+
+variables:
+    {charcodes::32}  = " "
+    {charcodes::33}  = "!"
+    {charcodes::34}  = """"
+    {charcodes::35}  = "##"
+    {charcodes::36}  = "$"
+    {charcodes::37}  = "%"
+    {charcodes::38}  = "&"
+    {charcodes::39}  = "'"
+    {charcodes::40}  = "("
+    {charcodes::41}  = ")"
+    {charcodes::42}  = "*"
+    {charcodes::43}  = "+"
+    {charcodes::44}  = ","
+    {charcodes::45}  = "-"
+    {charcodes::46}  = "."
+    {charcodes::47}  = "/"
+    {charcodes::48}  = "0"
+    {charcodes::49}  = "1"
+    {charcodes::50}  = "2"
+    {charcodes::51}  = "3"
+    {charcodes::52}  = "4"
+    {charcodes::53}  = "5"
+    {charcodes::54}  = "6"
+    {charcodes::55}  = "7"
+    {charcodes::56}  = "8"
+    {charcodes::57}  = "9"
+    {charcodes::58}  = ":"
+    {charcodes::59}  = ";"
+    {charcodes::60}  = "<"
+    {charcodes::61}  = "="
+    {charcodes::62}  = ">"
+    {charcodes::63}  = "?"
+    {charcodes::64}  = "@"
+    {charcodes::65}  = "A"
+    {charcodes::66}  = "B"
+    {charcodes::67}  = "C"
+    {charcodes::68}  = "D"
+    {charcodes::69}  = "E"
+    {charcodes::70}  = "F"
+    {charcodes::71}  = "G"
+    {charcodes::72}  = "H"
+    {charcodes::73}  = "I"
+    {charcodes::74}  = "J"
+    {charcodes::75}  = "K"
+    {charcodes::76}  = "L"
+    {charcodes::77}  = "M"
+    {charcodes::78}  = "N"
+    {charcodes::79}  = "O"
+    {charcodes::80}  = "P"
+    {charcodes::81}  = "Q"
+    {charcodes::82}  = "R"
+    {charcodes::83}  = "S"
+    {charcodes::84}  = "T"
+    {charcodes::85}  = "U"
+    {charcodes::86}  = "V"
+    {charcodes::87}  = "W"
+    {charcodes::88}  = "X"
+    {charcodes::89}  = "Y"
+    {charcodes::90}  = "Z"
+    {charcodes::91}  = "["
+    {charcodes::92}  = "\"
+    {charcodes::93}  = "]"
+    {charcodes::94}  = "^"
+    {charcodes::95}  = "_"
+    {charcodes::96}  = "`"
+    {charcodes::97}  = "a"
+    {charcodes::98}  = "b"
+    {charcodes::99}  = "c"
+    {charcodes::100} = "d"
+    {charcodes::101} = "e"
+    {charcodes::102} = "f"
+    {charcodes::103} = "g"
+    {charcodes::104} = "h"
+    {charcodes::105} = "i"
+    {charcodes::106} = "j"
+    {charcodes::107} = "k"
+    {charcodes::108} = "l"
+    {charcodes::109} = "m"
+    {charcodes::110} = "n"
+    {charcodes::111} = "o"
+    {charcodes::112} = "p"
+    {charcodes::113} = "q"
+    {charcodes::114} = "r"
+    {charcodes::115} = "s"
+    {charcodes::116} = "t"
+    {charcodes::117} = "u"
+    {charcodes::118} = "v"
+    {charcodes::119} = "w"
+    {charcodes::120} = "x"
+    {charcodes::121} = "y"
+    {charcodes::122} = "z"
+    {charcodes::123} = "{"
+    {charcodes::124} = "|"
+    {charcodes::125} = "}"
+    {charcodes::126} = "~"
+
+    {hex_digits::0}  = "0"
+    {hex_digits::1}  = "1"
+    {hex_digits::2}  = "2"
+    {hex_digits::3}  = "3"
+    {hex_digits::4}  = "4"
+    {hex_digits::5}  = "5"
+    {hex_digits::6}  = "6"
+    {hex_digits::7}  = "7"
+    {hex_digits::8}  = "8"
+    {hex_digits::9}  = "9"
+    {hex_digits::10} = "a"
+    {hex_digits::11} = "b"
+    {hex_digits::12} = "c"
+    {hex_digits::13} = "d"
+    {hex_digits::14} = "e"
+    {hex_digits::15} = "f"
+
+# Brainf*ck のプログラムを実行するコマンド。
+# 1つ目の引数はプログラムのコード。
+# 2つ目の引数はプログラムに渡す入力 (任意)。
+command /bf <text> <text = "">:
+    trigger:
+        set {_program::*} to split arg 1 at ""
+        set {_pc} to 1
+        set {_input::*} to split arg 2 at ""
+        set {_input-index} to 1
+        set {_memory::*} to 0
+        set {_pointer} to 1
+        set {_steps} to 0
+
+        while {_pc} is less than size of {_program::*}:
+            if {_steps} is greater than or equal to {@MAX_STEPS}:
+                send "&cERROR: At %{_pc}%: Program timeout" to sender
+                exit loop
+
+            set {_instruction} to {_program::%{_pc}%}
+
+            if {_instruction} is "+":
+                set {_memory::%{_pointer}%} to plus({_memory::%{_pointer}%})
+                add 1 to {_pc}
+            else if {_instruction} is "-":
+                set {_memory::%{_pointer}%} to minus({_memory::%{_pointer}%})
+                add 1 to {_pc}
+            else if {_instruction} is ">":
+                add 1 to {_pointer}
+                if {_memory::%{_pointer}%} is not set:
+                    set {_memory::%{_pointer}%} to 0
+                add 1 to {_pc}
+            else if {_instruction} is "<":
+                subtract 1 from {_pointer}
+                if {_pointer} is less than 1:
+                    send "&cERROR: At %{_pc}%: Memory underflow" to sender
+                    exit loop
+                add 1 to {_pc}
+            else if {_instruction} is "[":
+                if {_jump-addresses::%{_pc}%} is set:
+                    set {_jump-address} to {_jump-addresses::%{_pc}%}
+                else:
+                    set {_jump-address} to get_jump_address({_program::*}, {_pc})
+                    set {_jump-addresses::%{_pc}%} to {_jump-address}
+                    set {_jump-addresses::%{_jump-address}%} to {_pc}
+                if {_jump-address} is less than 0:
+                    send "&cERROR: At %{_pc}%: Corresponding right bracket is missing" to sender
+                    exit loop
+                if {_memory::%{_pointer}%} is 0:
+                    set {_pc} to {_jump-addresses::%{_pc}%} + 1
+                else:
+                    add 1 to {_pc}
+            else if {_instruction} is "]":
+                if {_jump-addresses::%{_pc}%} is not set:
+                    send "&cERROR: At %{_pc}%: Corresponding left bracket is missing" to sender
+                    exit loop
+                set {_pc} to {_jump-addresses::%{_pc}%}
+            else if {_instruction} is ".":
+                add {_memory::%{_pointer}%} to {_output::*}
+                add 1 to {_pc}
+            else if {_instruction} is ",":
+                if {_input-index} is less than size of {_input::*}:
+                    set {_memory::%{_pointer}%} to to_code_point({_input::%{_input-index}%})
+                    add 1 to {_input-index}
+                else:
+                    set {_memory::%{_pointer}%} to 0
+                add 1 to {_pc}
+
+            add 1 to {_steps}
+
+        send from_code_points({_output::*}) to sender
+
+command /bfc <text>:
+    trigger:
+        send to_code_point(arg 1) to sender
+
+# ラップアラウンド演算において8ビット符号なし整数に1を足す。
+function plus(x: integer) :: integer:
+    if {_x} is equal to 255:
+        set {_x} to 0
+    else:
+        add 1 to {_x}
+    return {_x}
+
+# ラップアラウンド演算において8ビット符号なし整数から1を引く。
+function minus(x: integer) :: integer:
+    if {_x} is equal to 0:
+        set {_x} to 255
+    else:
+        subtract 1 from {_x}
+    return {_x}
+
+# 文字から文字コードに変換する。
+function to_code_point(c: text) :: integer:
+    if {_c} matches "[A-Z]":
+        set {_result} to 65
+        while {_result} is less than or equal to 90:
+            if {charcodes::%{_result}%} is {_c}:
+                return {_result}
+            add 1 to {_result}
+    if {_c} matches "[a-z]":
+        set {_result} to 97
+        while {_result} is less than or equal to 122:
+            if {charcodes::%{_result}%} is {_c}:
+                return {_result}
+            add 1 to {_result}
+    set {_result} to 32
+    while {_result} is less than or equal to 126:
+        if {charcodes::%{_result}%} is {_c}:
+            return {_result}
+        add 1 to {_result}
+    return 0
+
+# 文字コードのリストから文字列に変換する。
+function from_code_points(code-points: integers) :: text:
+    loop {_code-points::*}:
+        if {charcodes::%loop-value%} is set:
+            add {charcodes::%loop-value%} to {_characters::*}
+        else if loop-value is 10:
+            add nl to {_characters::*}
+        else:
+            add hex(loop-value) to {_characters::*}
+    set {_result} to join {_characters::*} with ""
+    return {_result}
+
+# 整数値を2桁の16進数で表す文字列を返す。
+function hex(code: integer) :: text:
+    set {_high} to floor({_code} / 16)
+    set {_high-char} to {hex_digits::%{_high}%}
+    set {_low} to mod({_code}, 16)
+    set {_low-char} to {hex_digits::%{_low}%}
+    return "&e<%{_high-char}%%{_low-char}%>&r"
+
+# プログラム中の左括弧 "[" に対応する右括弧 "]" が何個目の文字であるかを求める。
+# 右括弧が見つからなかった場合は-1を返す。
+function get_jump_address(prog: texts, pc: integer) :: integer:
+    set {_nesting-depth} to 0
+    set {_result} to {_pc}
+    while {_result} is less than size of {_prog::*}:
+        set {_instruction} to {_prog::%{_result}%}
+        if {_instruction} is "[":
+            add 1 to {_nesting-depth}
+        else if {_instruction} is "]":
+            subtract 1 from {_nesting-depth}
+            if {_nesting-depth} is 0:
+                return {_result}
+        add 1 to {_result}
+    return -1
