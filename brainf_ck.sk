@@ -181,6 +181,9 @@ command /bf <text> <text = "">:
                 else:
                     set {_memory::%{_pointer}%} to 0
                 add 1 to {_pc}
+            else if {_instruction} is "?":
+                send "Memory: %{_memory::*}%" to sender
+                add 1 to {_pc}
 
             add 1 to {_steps}
 
