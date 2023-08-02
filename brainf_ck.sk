@@ -163,7 +163,7 @@ command /bf <text> <text = "">:
                     send "&cERROR: At %{_pc}%: Corresponding right bracket is missing" to sender
                     exit loop
                 if {_memory::%{_pointer}%} is 0:
-                    set {_pc} to {_jump-addresses::%{_pc}%} + 1
+                    set {_pc} to {_jump-address} + 1
                 else:
                     add 1 to {_pc}
             else if {_instruction} is "]":
@@ -182,8 +182,11 @@ command /bf <text> <text = "">:
                     set {_memory::%{_pointer}%} to 0
                 add 1 to {_pc}
             else if {_instruction} is "?":
-                send "Memory: %{_memory::*}%" to sender
+                send "Memory: At %{_pc}%: {%{_memory::*}%}" to sender
                 add 1 to {_pc}
+            else:
+                add 1 to {_pc}
+                continue loop
 
             add 1 to {_steps}
 
