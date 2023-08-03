@@ -122,10 +122,10 @@ command /bf <text> <text = "">:
     trigger:
         set {_program::*} to split arg 1 at ""
         set {_pc} to 1
-        set {_input::*} to split arg 2 at ""
-        set {_input-index} to 1
         set {_memory::*} to 0
         set {_pointer} to 1
+        set {_input::*} to split arg 2 at ""
+        set {_input-index} to 1
         set {_steps} to 0
 
         while {_pc} is less than size of {_program::*}:
@@ -135,7 +135,10 @@ command /bf <text> <text = "">:
 
             set {_instruction} to {_program::%{_pc}%}
 
-            if {_instruction} is "+":
+            if {_instruction} is "?":
+                send "Memory: At %{_pc}%: {%{_memory::*}%}" to sender
+                add 1 to {_pc}
+            else if {_instruction} is "+":
                 set {_memory::%{_pointer}%} to plus({_memory::%{_pointer}%})
                 add 1 to {_pc}
             else if {_instruction} is "-":
@@ -149,8 +152,18 @@ command /bf <text> <text = "">:
             else if {_instruction} is "<":
                 subtract 1 from {_pointer}
                 if {_pointer} is less than 1:
-                    send "&cERROR: At %{_pc}%: Memory underflow" to sender
+                    send "&cERROR: At %{_pc}%: Pointer out of bound" to sender
                     exit loop
+                add 1 to {_pc}
+            else if {_instruction} is ".":
+                add {_memory::%{_pointer}%} to {_output::*}
+                add 1 to {_pc}
+            else if {_instruction} is ",":
+                if {_input-index} is less than size of {_input::*}:
+                    set {_memory::%{_pointer}%} to to_code_point({_input::%{_input-index}%})
+                    add 1 to {_input-index}
+                else:
+                    set {_memory::%{_pointer}%} to 0
                 add 1 to {_pc}
             else if {_instruction} is "[":
                 if {_jump-addresses::%{_pc}%} is set:
@@ -171,19 +184,6 @@ command /bf <text> <text = "">:
                     send "&cERROR: At %{_pc}%: Corresponding left bracket is missing" to sender
                     exit loop
                 set {_pc} to {_jump-addresses::%{_pc}%}
-            else if {_instruction} is ".":
-                add {_memory::%{_pointer}%} to {_output::*}
-                add 1 to {_pc}
-            else if {_instruction} is ",":
-                if {_input-index} is less than size of {_input::*}:
-                    set {_memory::%{_pointer}%} to to_code_point({_input::%{_input-index}%})
-                    add 1 to {_input-index}
-                else:
-                    set {_memory::%{_pointer}%} to 0
-                add 1 to {_pc}
-            else if {_instruction} is "?":
-                send "Memory: At %{_pc}%: {%{_memory::*}%}" to sender
-                add 1 to {_pc}
             else:
                 add 1 to {_pc}
                 continue loop
