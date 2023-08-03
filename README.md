@@ -45,3 +45,4 @@ HELLO
 * Pointer out of bound - 最初のセルより左のセルにアクセスしようとしました
 * Corresponding right bracket is missing - 左括弧 `[` に対応する右括弧 `]` が欠落しています
 * Corresponding left bracket is missing - 右括弧 `]` に対応する左括弧 `[` が欠落しています
+* Output limit reached - 出力文字数の上限に達しました。
