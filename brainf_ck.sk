@@ -1,4 +1,5 @@
 options:
+    MAX_OUTPUT_LENGTH: 200 # 出力の最大文字数
     MAX_STEPS: 100000  # 1回のプログラムで実行できるステップ数の上限。
 
 variables:
@@ -163,6 +164,9 @@ command /bf <text> <text = "">:
                     set {_memory::%{_pointer}%} to 0
                 add 1 to {_pc}
             else if {_instruction} is ".":
+                if size of {_output::*} is greater than or equal to {@MAX_OUTPUT_LENGTH}:
+                    send "&cERROR: At %{_pc}%: Output limit reached" to sender
+                    exit loop
                 add from_code_point({_memory::%{_pointer}%}) to {_output::*}
                 add 1 to {_pc}
             else if {_instruction} is "[":
@@ -172,7 +176,7 @@ command /bf <text> <text = "">:
                     set {_jump-address} to get_jump_address({_program::*}, {_pc})
                     set {_jump-addresses::%{_pc}%} to {_jump-address}
                     set {_jump-addresses::%{_jump-address}%} to {_pc}
-                if {_jump-address} is less than 0:
+                if {_jump-address} is equal to -1:
                     send "&cERROR: At %{_pc}%: Corresponding right bracket is missing" to sender
                     exit loop
                 if {_memory::%{_pointer}%} is 0:
