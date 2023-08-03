@@ -155,15 +155,15 @@ command /bf <text> <text = "">:
                     send "&cERROR: At %{_pc}%: Pointer out of bound" to sender
                     exit loop
                 add 1 to {_pc}
-            else if {_instruction} is ".":
-                add {_memory::%{_pointer}%} to {_output::*}
-                add 1 to {_pc}
             else if {_instruction} is ",":
                 if {_input-index} is less than size of {_input::*}:
                     set {_memory::%{_pointer}%} to to_code_point({_input::%{_input-index}%})
                     add 1 to {_input-index}
                 else:
                     set {_memory::%{_pointer}%} to 0
+                add 1 to {_pc}
+            else if {_instruction} is ".":
+                add from_code_point({_memory::%{_pointer}%}) to {_output::*}
                 add 1 to {_pc}
             else if {_instruction} is "[":
                 if {_jump-addresses::%{_pc}%} is set:
@@ -190,7 +190,7 @@ command /bf <text> <text = "">:
 
             add 1 to {_steps}
 
-        send from_code_points({_output::*}) to sender
+        send join {_output::*} with "" to sender
 
 # ラップアラウンド演算において8ビット符号なし整数に1を足す。
 function plus(x: integer) :: integer:
@@ -229,17 +229,14 @@ function to_code_point(c: text) :: integer:
         add 1 to {_result}
     return 0
 
-# 文字コードのリストから文字列に変換する。
-function from_code_points(code-points: integers) :: text:
-    loop {_code-points::*}:
-        if {brainf_ck.charcodes::%loop-value%} is set:
-            add {brainf_ck.charcodes::%loop-value%} to {_characters::*}
-        else if loop-value is 10:
-            add nl to {_characters::*}
-        else:
-            add hex(loop-value) to {_characters::*}
-    set {_result} to join {_characters::*} with ""
-    return {_result}
+# 文字コードから文字に変換する。
+function from_code_point(cp: integer) :: text:
+    if {brainf_ck.charcodes::%{_cp}%} is set:
+        return {brainf_ck.charcodes::%{_cp}%}
+    else if {_cp} is 10:
+        return nl
+    else:
+        return hex({_cp})
 
 # 整数値を2桁の16進数で表す文字列を返す。
 function hex(code: integer) :: text:
